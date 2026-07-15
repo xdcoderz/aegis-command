@@ -1,0 +1,41 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv*/
+dist/
+build/
+*.egg-info/
+*.db
+
+# Machine-learning artifacts
+artifacts/models/*
+!artifacts/models/.gitkeep
+data/generated/*
+!data/generated/.gitkeep
+
+# JavaScript
+node_modules/
+apps/web/dist/
+apps/web/coverage/
+*.tsbuildinfo
+
+# IDE and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Runtime keys and vault material
+secrets/
+*.key
+*.pem
