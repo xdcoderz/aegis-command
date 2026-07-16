@@ -93,6 +93,22 @@ class PqcVault:
         self._runtime = runtime
         self._envelopes: dict[UUID, VaultEnvelope] = {}
 
+    @property
+    def algorithm(self) -> str:
+        return f"{self._runtime.kem_algorithm}+HKDF-SHA256+AES-256-GCM"
+
+    @property
+    def envelope_count(self) -> int:
+        return len(self._envelopes)
+
+    @property
+    def mode(self) -> str:
+        return "Open Quantum Safe"
+
+    @property
+    def quantum_safe(self) -> bool:
+        return True
+
     @staticmethod
     def _derive_key(shared_secret: bytes, envelope_id: UUID) -> bytes:
         return HKDF(
@@ -110,7 +126,7 @@ class PqcVault:
         ciphertext = AESGCM(key).encrypt(nonce, plaintext.encode("utf-8"), envelope_id.bytes)
         envelope = VaultEnvelope(
             envelope_id=envelope_id,
-            algorithm=f"{self._runtime.kem_algorithm}+HKDF-SHA256+AES-256-GCM",
+            algorithm=self.algorithm,
             encapsulated_key=encapsulated_key,
             nonce=nonce,
             ciphertext=ciphertext,
@@ -133,3 +149,49 @@ class PqcVault:
         )
         return plaintext.decode("utf-8")
 
+
+class DevelopmentVault:
+    """Functional local vault used when liboqs is absent; never presented as PQC."""
+
+    def __init__(self) -> None:
+        self._master_key = AESGCM.generate_key(bit_length=256)
+        self._envelopes: dict[UUID, tuple[bytes, bytes]] = {}
+
+    @property
+    def algorithm(self) -> str:
+        return "AES-256-GCM local compatibility mode"
+
+    @property
+    def envelope_count(self) -> int:
+        return len(self._envelopes)
+
+    @property
+    def mode(self) -> str:
+        return "Local round-trip fallback; Docker activates ML-KEM-768"
+
+    @property
+    def quantum_safe(self) -> bool:
+        return False
+
+    def store(self, plaintext: str) -> dict[str, str]:
+        envelope_id = uuid4()
+        nonce = os.urandom(12)
+        ciphertext = AESGCM(self._master_key).encrypt(
+            nonce, plaintext.encode("utf-8"), envelope_id.bytes
+        )
+        self._envelopes[envelope_id] = (nonce, ciphertext)
+        return {
+            "envelope_id": str(envelope_id),
+            "algorithm": self.algorithm,
+            "ciphertext": base64.b64encode(ciphertext).decode("ascii"),
+        }
+
+    def retrieve(self, envelope_id: UUID) -> str | None:
+        envelope = self._envelopes.get(envelope_id)
+        if envelope is None:
+            return None
+        nonce, ciphertext = envelope
+        plaintext = AESGCM(self._master_key).decrypt(
+            nonce, ciphertext, envelope_id.bytes
+        )
+        return plaintext.decode("utf-8")

@@ -14,6 +14,18 @@ class RiskPolicy:
         "rule": 0.05,
     }
 
+    def __init__(self, *, step_up_threshold: float = 40, block_threshold: float = 70) -> None:
+        self.configure(
+            step_up_threshold=step_up_threshold,
+            block_threshold=block_threshold,
+        )
+
+    def configure(self, *, step_up_threshold: float, block_threshold: float) -> None:
+        if not 0 < step_up_threshold < block_threshold <= 100:
+            raise ValueError("Risk thresholds must satisfy 0 < step-up < block <= 100")
+        self.step_up_threshold = step_up_threshold
+        self.block_threshold = block_threshold
+
     def evaluate(
         self, anomaly_score: float, features: dict[str, float]
     ) -> tuple[float, AccessDecision, list[RiskFactor]]:
@@ -41,9 +53,9 @@ class RiskPolicy:
             for key, value in values.items()
         ]
         score = round(sum(factor.score for factor in factors), 2)
-        if score >= 70:
+        if score >= self.block_threshold:
             decision = AccessDecision.BLOCK
-        elif score >= 40:
+        elif score >= self.step_up_threshold:
             decision = AccessDecision.STEP_UP_AUTH
         else:
             decision = AccessDecision.ALLOW

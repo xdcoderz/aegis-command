@@ -2,10 +2,18 @@ from __future__ import annotations
 
 import random
 from datetime import UTC, datetime, timedelta
+from typing import TypedDict
 
 from finspark.domain.models import SessionEvent
 
-ROLE_PROFILES = {
+
+class RoleProfile(TypedDict):
+    resources: list[str]
+    commands: list[str]
+    sensitivity: float
+
+
+ROLE_PROFILES: dict[str, RoleProfile] = {
     "database-admin": {
         "resources": ["customer-db", "reporting-db", "replica-db"],
         "commands": ["select health", "show replication", "backup verify", "explain query"],
@@ -37,7 +45,9 @@ class SyntheticSessionGenerator:
         hour = int(min(max(self._random.gauss(11, 2), 7), 18))
         duration = max(self._random.gauss(32, 9), 5)
         command_count = self._random.randint(2, 5)
-        commands = [self._random.choice(profile["commands"]) for _ in range(command_count)]
+        commands: list[str] = [
+            self._random.choice(profile["commands"]) for _ in range(command_count)
+        ]
         return SessionEvent(
             session_id=f"baseline-{index:05d}",
             user_id=f"admin-{user_number:02d}",
@@ -56,4 +66,3 @@ class SyntheticSessionGenerator:
 
     def training_set(self, count: int = 480) -> list[SessionEvent]:
         return [self.normal(index) for index in range(count)]
-

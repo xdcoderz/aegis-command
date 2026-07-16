@@ -37,8 +37,12 @@ COPY --from=oqs-builder /install/ /usr/local/
 WORKDIR /app
 COPY apps/api/pyproject.toml apps/api/README.md ./
 COPY apps/api/src ./src
+COPY apps/api/alembic.ini ./alembic.ini
+COPY apps/api/alembic ./alembic
+COPY infra/docker/api-entrypoint.sh /usr/local/bin/finspark-api-entrypoint
 RUN pip install --no-cache-dir .
+RUN chmod 0555 /usr/local/bin/finspark-api-entrypoint
 
 USER finspark
 EXPOSE 8000
-CMD ["fastapi", "run", "src/finspark/main.py", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/usr/local/bin/finspark-api-entrypoint"]

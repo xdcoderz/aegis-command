@@ -48,3 +48,20 @@ def test_high_risk_signals_are_blocked() -> None:
     assert decision is AccessDecision.BLOCK
     assert sum(factor.score for factor in factors) == 100
 
+
+def test_runtime_policy_thresholds_change_future_decisions() -> None:
+    features = {
+        "asset_sensitivity": 0.0,
+        "privilege_context": 0.0,
+        "session_context": 0.0,
+        "deterministic_rule": 0.0,
+    }
+    policy = RiskPolicy(step_up_threshold=20, block_threshold=40)
+
+    score, initial, _ = policy.evaluate(0.5, features)
+    policy.configure(step_up_threshold=10, block_threshold=25)
+    _, updated, _ = policy.evaluate(0.5, features)
+
+    assert score == 30
+    assert initial is AccessDecision.STEP_UP_AUTH
+    assert updated is AccessDecision.BLOCK

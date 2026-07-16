@@ -42,37 +42,69 @@ const normalPreset: SessionEvent = {
 
 export function SessionComposer({ busy, onSubmit }: Props) {
   const [event, setEvent] = useState<SessionEvent>(maliciousPreset);
+  const [preset, setPreset] = useState<"normal" | "anomalous">("anomalous");
 
-  async function submit(e: FormEvent) {
-    e.preventDefault();
-    await onSubmit({ ...event, session_id: `${event.session_id.split("-").slice(0, -1).join("-")}-${Date.now()}` });
+  function choosePreset(next: "normal" | "anomalous") {
+    setPreset(next);
+    setEvent(next === "normal" ? normalPreset : maliciousPreset);
+  }
+
+  async function submit(formEvent: FormEvent) {
+    formEvent.preventDefault();
+    await onSubmit({
+      ...event,
+      event_id: crypto.randomUUID(),
+      session_id: `${event.session_id.replace(/-\d+$/, "")}-${Date.now()}`,
+    });
   }
 
   return (
     <section className="composer card">
-      <div className="section-heading">
-        <div><p className="eyebrow">Session replay</p><h2>Evaluation console</h2></div>
-        <div className="preset-switch">
-          <button type="button" onClick={() => setEvent(normalPreset)}>Normal</button>
-          <button type="button" className="active" onClick={() => setEvent(maliciousPreset)}>Anomalous</button>
+      <div className="card-step-header">
+        <span className="step-chip">Step 1</span>
+        <div><h3>Tell us about the session</h3><p>Use a ready-made example or enter the access context you want to check.</p></div>
+      </div>
+
+      <div className="preset-block">
+        <div className="field-title"><span>Choose a starting point</span><small>You can edit every value below</small></div>
+        <div className="preset-switch" role="group" aria-label="Session preset">
+          <button type="button" className={preset === "normal" ? "active" : ""} onClick={() => choosePreset("normal")}>
+            <span className="preset-icon normal">✓</span><span><strong>Expected activity</strong><small>Known device, routine commands</small></span>
+          </button>
+          <button type="button" className={preset === "anomalous" ? "active" : ""} onClick={() => choosePreset("anomalous")}>
+            <span className="preset-icon anomalous">!</span><span><strong>Suspicious activity</strong><small>Unknown device, risky commands</small></span>
+          </button>
         </div>
       </div>
+
       <form onSubmit={submit}>
+        <div className="form-section-label"><span>Access context</span><small>Who is accessing what, and from where?</small></div>
         <div className="form-grid">
-          <label>User<input value={event.user_id} onChange={(e) => setEvent({ ...event, user_id: e.target.value })} /></label>
-          <label>Role<input value={event.role} onChange={(e) => setEvent({ ...event, role: e.target.value })} /></label>
-          <label>Resource<input value={event.resource} onChange={(e) => setEvent({ ...event, resource: e.target.value })} /></label>
-          <label>Source IP<input value={event.source_ip} onChange={(e) => setEvent({ ...event, source_ip: e.target.value })} /></label>
+          <label className="field"><span>User identity</span><input required value={event.user_id} onChange={(e) => setEvent({ ...event, user_id: e.target.value })} /><small>The employee or service account</small></label>
+          <label className="field"><span>Privileged role</span><input required value={event.role} onChange={(e) => setEvent({ ...event, role: e.target.value })} /><small>The role active in this session</small></label>
+          <label className="field"><span>Protected resource</span><input required value={event.resource} onChange={(e) => setEvent({ ...event, resource: e.target.value })} /><small>The system or data being accessed</small></label>
+          <label className="field"><span>Source IP address</span><input required value={event.source_ip} onChange={(e) => setEvent({ ...event, source_ip: e.target.value })} /><small>Where the session originated</small></label>
         </div>
-        <label>Commands<textarea rows={4} value={event.commands.join("\n")} onChange={(e) => setEvent({ ...event, commands: e.target.value.split("\n").filter(Boolean) })} /></label>
-        <div className="signal-row">
-          <label><input type="checkbox" checked={event.privilege_escalated} onChange={(e) => setEvent({ ...event, privilege_escalated: e.target.checked })} /> Privilege escalation</label>
-          <span>{(event.bytes_transferred / 1_000_000).toFixed(1)} MB transferred</span>
-          <span>Sensitivity {Math.round(event.resource_sensitivity * 100)}%</span>
-        </div>
-        <button className="primary" disabled={busy}>{busy ? "Evaluating…" : "Evaluate session"}<span>→</span></button>
+
+        <label className="field command-field"><span>Observed commands</span><textarea required rows={4} value={event.commands.join("\n")} onChange={(e) => setEvent({ ...event, commands: e.target.value.split("\n").filter(Boolean) })} /><small>Enter one command per line. FinSpark treats this as telemetry, never as executable input.</small></label>
+
+        <details className="advanced-details">
+          <summary><span><strong>Review advanced signals</strong><small>Optional details improve the recommendation</small></span><i>+</i></summary>
+          <div className="advanced-grid">
+            <label className="field"><span>Resource sensitivity <b>{Math.round(event.resource_sensitivity * 100)}%</b></span><input type="range" min="0" max="1" step="0.05" value={event.resource_sensitivity} onChange={(e) => setEvent({ ...event, resource_sensitivity: Number(e.target.value) })} /></label>
+            <label className="field"><span>Privilege level</span><input type="number" min="1" max="5" value={event.privilege_level} onChange={(e) => setEvent({ ...event, privilege_level: Number(e.target.value) })} /></label>
+            <label className="field"><span>Failed sign-ins</span><input type="number" min="0" max="100" value={event.failed_auth_attempts} onChange={(e) => setEvent({ ...event, failed_auth_attempts: Number(e.target.value) })} /></label>
+            <label className="field"><span>Data transferred (bytes)</span><input type="number" min="0" value={event.bytes_transferred} onChange={(e) => setEvent({ ...event, bytes_transferred: Number(e.target.value) })} /></label>
+          </div>
+        </details>
+
+        <label className="escalation-check"><input type="checkbox" checked={event.privilege_escalated} onChange={(e) => setEvent({ ...event, privilege_escalated: e.target.checked })} /><span><strong>Privilege escalation occurred</strong><small>The account gained higher permissions during this session</small></span></label>
+
+        <button className="button button-primary submit-button" disabled={busy}>
+          {busy ? <><span className="spinner" /> Evaluating the session…</> : <>Evaluate session <span>→</span></>}
+        </button>
+        <p className="form-assurance"><span>✓</span> The result includes an explanation and recommended next step.</p>
       </form>
     </section>
   );
 }
-

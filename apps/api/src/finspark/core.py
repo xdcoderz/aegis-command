@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
+    trusted_hosts: list[str] = Field(
+        default_factory=lambda: ["localhost", "127.0.0.1", "testserver"]
+    )
+    max_request_bytes: int = Field(default=1_048_576, ge=16_384, le=16_777_216)
     database_url: str = "sqlite+aiosqlite:///./finspark.db"
     auto_create_schema: bool = True
     model_seed: int = 2026
@@ -28,6 +32,24 @@ class Settings(BaseSettings):
     pqc_required: bool = False
     pqc_kem_algorithm: str = "ML-KEM-768"
     pqc_signature_algorithm: str = "ML-DSA-65"
+    auth_enabled: bool = False
+    api_keys: dict[str, str] = Field(default_factory=dict)
+    enforcement_webhook_url: str | None = None
+    enforcement_webhook_secret: SecretStr | None = None
+    enforcement_sandbox_enabled: bool = False
+    enforcement_timeout_seconds: float = Field(default=3.0, gt=0, le=30)
+    enforcement_max_attempts: int = Field(default=3, ge=1, le=5)
+
+    @field_validator("api_keys")
+    @classmethod
+    def validate_api_keys(cls, value: dict[str, str]) -> dict[str, str]:
+        allowed = {"observer", "analyst", "admin"}
+        invalid = sorted(set(value.values()) - allowed)
+        if invalid:
+            raise ValueError(f"unsupported API key roles: {', '.join(invalid)}")
+        if any(len(key) < 16 for key in value):
+            raise ValueError("API keys must be at least 16 characters")
+        return value
 
 
 @lru_cache
@@ -40,4 +62,3 @@ def configure_logging(level: str) -> None:
         level=level.upper(),
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
-

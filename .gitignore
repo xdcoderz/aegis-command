@@ -39,3 +39,4 @@ Thumbs.db
 secrets/
 *.key
 *.pem
+*.log

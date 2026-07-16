@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
-from sklearn.ensemble import IsolationForest
+from sklearn.ensemble import IsolationForest  # type: ignore[import-untyped]
 
 
 class IsolationForestDetector:
@@ -40,4 +40,3 @@ class IsolationForestDetector:
             raise RuntimeError("Isolation Forest is not fitted")
         raw = float(self._model.score_samples(np.asarray([vector], dtype=float))[0])
         return min(max((self._high - raw) / (self._high - self._low), 0.0), 1.0)
-
