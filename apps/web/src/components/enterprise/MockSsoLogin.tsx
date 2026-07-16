@@ -24,7 +24,7 @@ export function MockSsoLogin({ onLogin, busy = false, productName = "Aegis Comma
     setError(null);
     const identity: MockSsoIdentity = role === "SOC_ANALYST"
       ? { displayName: "Adittya Sharma", email: "adittya.sharma@bank.demo", role, provider }
-      : { displayName: "Devyanshu Agrawal", email: "devyanshu.agrawal@bank.demo", role, provider };
+      : { displayName: "Adittya Sharma", email: "adittya.sharma+admin@bank.demo", role, provider };
     try {
       await onLogin(identity);
     } catch (caught) {
