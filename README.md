@@ -6,6 +6,15 @@ Aegis Command evaluates high-impact administrative sessions while they are in pr
 
 The system is designed to complement a bank's PAM, IAM, SIEM, and incident-response stack. It does not execute submitted command text and it does not treat an anomaly score as proof of malicious intent.
 
+## Demo
+
+- Product walkthrough: <https://www.youtube.com/watch?v=XyqpGPwfOkI>
+- Live console: <https://web-production-35cc9.up.railway.app>
+- API readiness: <https://api-production-62b42.up.railway.app/api/v1/health/ready>
+- OpenAPI reference: <https://api-production-62b42.up.railway.app/docs>
+
+The hosted demo uses deterministic banking scenarios so reviewers can inspect normal activity, step-up authentication cases, blocked privileged misuse, enforcement results, and the signed audit trail without needing to create their own telemetry first.
+
 ## Capabilities
 
 | Area | What is implemented |
