@@ -25,7 +25,7 @@ const ADMIN_API_KEY = import.meta.env.VITE_ADMIN_API_KEY as string | undefined;
 
 function activeApiKey(): string | undefined {
   try {
-    const raw = window.sessionStorage.getItem("finspark.demo.identity");
+    const raw = window.sessionStorage.getItem("aegis-command.demo.identity");
     const identity = raw ? JSON.parse(raw) as { role?: string } : null;
     return identity?.role === "SECURITY_ADMIN" ? ADMIN_API_KEY ?? ANALYST_API_KEY : ANALYST_API_KEY;
   } catch {
@@ -35,7 +35,7 @@ function activeApiKey(): string | undefined {
 
 function demoActor(): string | undefined {
   try {
-    const raw = window.sessionStorage.getItem("finspark.demo.identity");
+    const raw = window.sessionStorage.getItem("aegis-command.demo.identity");
     if (!raw) return undefined;
     const identity = JSON.parse(raw) as { displayName?: string };
     return identity.displayName;

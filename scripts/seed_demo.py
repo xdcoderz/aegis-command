@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Reset and seed the local FinSpark judge-demo dataset.
+"""Reset and seed the Aegis Command reference scenario dataset.
 
-The reset path is deliberately fixed to apps/api/finspark.db.  This utility will
+The reset path is deliberately fixed to apps/api/aegis-command.db. This utility will
 not delete data from a configured PostgreSQL instance or from an arbitrary file.
 """
 
@@ -23,7 +23,7 @@ from uuid import UUID, uuid5
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-LOCAL_DEMO_DB = (PROJECT_ROOT / "apps" / "api" / "finspark.db").resolve()
+LOCAL_DEMO_DB = (PROJECT_ROOT / "apps" / "api" / "aegis-command.db").resolve()
 DEFAULT_API_BASE = "http://127.0.0.1:8000/api/v1/"
 EVENT_NAMESPACE = UUID("d71437eb-ed67-552b-a518-55b7238327be")
 RESET_TABLES = (
@@ -345,7 +345,7 @@ class LocalApiClient:
         body = json.dumps(payload).encode("utf-8") if payload is not None else None
         headers = {
             "Accept": "application/json",
-            "X-Demo-Actor": "judge-demo-seed",
+            "X-Demo-Actor": "reference-scenario-seed",
         }
         if payload is not None:
             headers["Content-Type"] = "application/json"
@@ -366,12 +366,12 @@ class LocalApiClient:
             detail = exc.read().decode("utf-8", errors="replace")
             raise SeedError(f"API {method} {path} returned {exc.code}: {detail}") from exc
         except URLError as exc:
-            raise SeedError(f"Cannot reach the local FinSpark API at {self.base_url}: {exc.reason}") from exc
+            raise SeedError(f"Cannot reach the Aegis Command API at {self.base_url}: {exc.reason}") from exc
 
 
 def _print_scenarios(scenarios: tuple[DemoScenario, ...], *, verbose: bool = False) -> None:
-    print("Curated judge-demo sessions")
-    print("---------------------------")
+    print("Aegis Command reference scenarios")
+    print("---------------------------------")
     for scenario in scenarios:
         payload = scenario.payload
         print(
@@ -426,7 +426,7 @@ def seed(client: LocalApiClient, scenarios: tuple[DemoScenario, ...]) -> dict[st
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Seed a clean, deterministic dataset into the local FinSpark API."
+        description="Seed deterministic reference scenarios through the Aegis Command API."
     )
     parser.add_argument(
         "--api-base",
@@ -435,13 +435,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument(
         "--api-key",
-        default=os.getenv("FINSPARK_DEMO_API_KEY"),
+        default=os.getenv("AEGIS_DEMO_API_KEY"),
         help="Admin API key when local authentication is enabled.",
     )
     parser.add_argument(
         "--reset-local-db",
         action="store_true",
-        help="Delete existing demo records from apps/api/finspark.db before seeding.",
+        help="Delete existing demo records from apps/api/aegis-command.db before seeding.",
     )
     parser.add_argument(
         "--dry-run",
@@ -492,7 +492,7 @@ def main(argv: list[str] | None = None) -> int:
         print("\nSeeding sessions")
         observed = seed(client, scenarios)
         print(
-            "\nJudge dataset ready: "
+            "\nReference dataset ready: "
             f"{observed['ALLOW']} allow, "
             f"{observed['STEP_UP_AUTH']} step-up, "
             f"{observed['BLOCK']} block."

@@ -1,6 +1,6 @@
-# Judge demo data
+# Reference scenario data
 
-The demo seed contains nine privileged banking sessions: four routine sessions,
+The reference seed contains nine privileged banking sessions: four routine sessions,
 two sessions that require step-up authentication, and three sessions that should
 be blocked. The identities, event UUIDs and session IDs are stable across runs.
 Event times are placed within the previous 24 hours so the command centre stays
@@ -34,7 +34,7 @@ python scripts/seed_demo.py --reset-local-db
 ```
 
 The reset is intentionally narrow. It can only open
-`D:\code\Finspark\apps\api\finspark.db`, checks the SQLite signature and required
+`apps/api/aegis-command.db`, checks the SQLite signature and required
 tables, and deletes child records before parent assessments. It never reads the
 database URL from `.env`, so it cannot reset the Docker PostgreSQL database by
 accident. Before deleting anything, it also confirms the loopback API is ready.
@@ -50,6 +50,6 @@ If local API authentication is enabled, provide an admin key without putting it
 in shell history:
 
 ```powershell
-$env:FINSPARK_DEMO_API_KEY = "your-local-admin-key"
+$env:AEGIS_DEMO_API_KEY = "your-local-admin-key"
 python scripts/seed_demo.py --reset-local-db
 ```

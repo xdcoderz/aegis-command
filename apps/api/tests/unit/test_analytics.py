@@ -1,9 +1,9 @@
 from datetime import UTC, datetime
 
-from finspark.analytics.risk import RiskPolicy
-from finspark.analytics.runtime import DetectionRuntime
-from finspark.analytics.synthetic import SyntheticSessionGenerator
-from finspark.domain.models import AccessDecision, SessionEvent
+from aegis_command.analytics.risk import RiskPolicy
+from aegis_command.analytics.runtime import DetectionRuntime
+from aegis_command.analytics.synthetic import SyntheticSessionGenerator
+from aegis_command.domain.models import AccessDecision, SessionEvent
 
 
 def test_malicious_session_scores_above_normal_session() -> None:

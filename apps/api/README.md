@@ -1,18 +1,30 @@
-# FinSpark Sentinel API
+# Aegis Command API
 
-The service package follows domain/application/infrastructure separation. Run `fastapi dev src/finspark/main.py` from this directory after installing the package in editable mode.
+FastAPI service for explainable privileged-access assessment, enforcement coordination, evidence storage, and post-quantum demonstrations.
 
-Operational controls include API-key RBAC, database-backed event idempotency, retry-safe signed
-enforcement webhooks, analyst dispositions, verifiable PQC receipts, readiness checks, request
-correlation, security headers, and Prometheus metrics. See `../../docs/operations.md` for configuration
-and deployment guidance.
+## Run locally
 
-The SOC console uses these persisted APIs under `/api/v1`:
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
+$env:AEGIS_PQC_REQUIRED = "false"
+fastapi dev src/aegis_command/main.py
+```
 
-- `GET /overview` for command-center metrics, trend data, and top risky sessions.
-- `GET /sessions` and `GET /sessions/{session_id}` for sortable triage and investigation evidence.
-- `POST /sessions/{session_id}/action` for analyst allow, step-up, or block responses.
-- `GET|PUT /policies` for versioned thresholds used by subsequent risk decisions.
-- `GET /audit` for paginated risk-engine and analyst response records.
+The local default uses `aegis-command.db` and creates its schema automatically. Docker and hosted deployments use Alembic migrations with PostgreSQL.
 
-OpenAPI request and response schemas remain available at `/docs` during local development.
+## Package boundaries
+
+- `domain` — validated session, decision, enforcement, and audit models
+- `application` — assessment and SOC use cases plus integration ports
+- `analytics` — baseline construction, features, Isolation Forest, and risk policy
+- `security` — authentication, ML-KEM vault envelope, and ML-DSA receipts
+- `infrastructure` — SQLAlchemy, enforcement adapters, and metrics
+- `api` — versioned HTTP routes, dependencies, and middleware
+
+## Operational controls
+
+The service includes API-key RBAC, database-backed event idempotency, signed retry-safe enforcement webhooks, analyst dispositions, verifiable receipts, readiness checks, correlation IDs, security headers, request-size limits, trusted-host validation, and Prometheus metrics.
+
+See the repository [README](../../README.md), [operations guide](../../docs/operations.md), and [threat model](../../docs/threat-model.md) for configuration and security boundaries.

@@ -24,12 +24,12 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     LD_LIBRARY_PATH=/usr/local/lib \
     OQS_INSTALL_PATH=/usr/local \
-    FINSPARK_PQC_REQUIRED=true
+    AEGIS_PQC_REQUIRED=true
 
 RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --gid 10001 finspark \
-    && useradd --uid 10001 --gid finspark --create-home finspark
+    && groupadd --gid 10001 aegis \
+    && useradd --uid 10001 --gid aegis --create-home aegis
 
 COPY --from=oqs-builder /usr/local/lib/ /usr/local/lib/
 COPY --from=oqs-builder /install/ /usr/local/
@@ -39,10 +39,11 @@ COPY apps/api/pyproject.toml apps/api/README.md ./
 COPY apps/api/src ./src
 COPY apps/api/alembic.ini ./alembic.ini
 COPY apps/api/alembic ./alembic
-COPY infra/docker/api-entrypoint.sh /usr/local/bin/finspark-api-entrypoint
+COPY scripts ./scripts
+COPY infra/docker/api-entrypoint.sh /usr/local/bin/aegis-command-api-entrypoint
 RUN pip install --no-cache-dir .
-RUN chmod 0555 /usr/local/bin/finspark-api-entrypoint
+RUN chmod 0555 /usr/local/bin/aegis-command-api-entrypoint
 
-USER finspark
+USER aegis
 EXPOSE 8000
-ENTRYPOINT ["/usr/local/bin/finspark-api-entrypoint"]
+ENTRYPOINT ["/usr/local/bin/aegis-command-api-entrypoint"]

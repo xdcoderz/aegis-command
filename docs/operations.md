@@ -2,7 +2,7 @@
 
 ## Authentication and roles
 
-Set `FINSPARK_AUTH_ENABLED=true` and provide a JSON mapping in `FINSPARK_API_KEYS`:
+Set `AEGIS_AUTH_ENABLED=true` and provide a JSON mapping in `AEGIS_API_KEYS`:
 
 ```text
 {"replace-with-observer-key":"observer","replace-with-analyst-key":"analyst","replace-with-admin-key":"admin"}
@@ -15,10 +15,10 @@ replace them before any shared deployment.
 
 ## Enforcement gateway contract
 
-Configure `FINSPARK_ENFORCEMENT_WEBHOOK_URL` and
-`FINSPARK_ENFORCEMENT_WEBHOOK_SECRET`. The API sends the assessment as canonical JSON with:
+Configure `AEGIS_ENFORCEMENT_WEBHOOK_URL` and
+`AEGIS_ENFORCEMENT_WEBHOOK_SECRET`. The API sends the assessment as canonical JSON with:
 
-- `X-FinSpark-Signature: sha256=<HMAC-SHA256 body digest>`
+- `X-Aegis-Signature: sha256=<HMAC-SHA256 body digest>`
 - `X-Idempotency-Key: <event_id>`
 - `Content-Type: application/json`
 
@@ -42,7 +42,7 @@ original assessment with HTTP 200 and `X-Idempotent-Replay: true`.
 
 The API container runs `alembic upgrade head` before startup. For Kubernetes or multiple replicas,
 run the same command once in a release/migration job and start application replicas only after it
-succeeds. Keep `FINSPARK_AUTO_CREATE_SCHEMA=false` outside local tests.
+succeeds. Keep `AEGIS_AUTO_CREATE_SCHEMA=false` outside local tests.
 
 ## Production boundaries
 

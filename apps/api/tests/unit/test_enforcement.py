@@ -5,14 +5,14 @@ import hmac
 
 import httpx
 
-from finspark.analytics.risk import RiskPolicy
-from finspark.analytics.runtime import DetectionRuntime
-from finspark.analytics.synthetic import SyntheticSessionGenerator
-from finspark.application.services import AssessmentService
-from finspark.domain.models import EnforcementStatus
-from finspark.infrastructure.database import InMemoryAssessmentRepository
-from finspark.infrastructure.enforcement import WebhookEnforcementAdapter
-from finspark.security.pqc import NullAuditSigner
+from aegis_command.analytics.risk import RiskPolicy
+from aegis_command.analytics.runtime import DetectionRuntime
+from aegis_command.analytics.synthetic import SyntheticSessionGenerator
+from aegis_command.application.services import AssessmentService
+from aegis_command.domain.models import EnforcementStatus
+from aegis_command.infrastructure.database import InMemoryAssessmentRepository
+from aegis_command.infrastructure.enforcement import WebhookEnforcementAdapter
+from aegis_command.security.pqc import NullAuditSigner
 
 
 async def test_webhook_enforcement_is_signed_and_idempotent() -> None:
@@ -20,7 +20,7 @@ async def test_webhook_enforcement_is_signed_and_idempotent() -> None:
 
     async def gateway(request: httpx.Request) -> httpx.Response:
         body = await request.aread()
-        observed["signature"] = request.headers["X-FinSpark-Signature"]
+        observed["signature"] = request.headers["X-Aegis-Signature"]
         observed["idempotency_key"] = request.headers["X-Idempotency-Key"]
         observed["expected_signature"] = (
             "sha256=" + hmac.new(b"gateway-secret", body, hashlib.sha256).hexdigest()

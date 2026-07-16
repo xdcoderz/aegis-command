@@ -2,4 +2,4 @@
 set -eu
 
 alembic upgrade head
-exec fastapi run src/finspark/main.py --host 0.0.0.0 --port 8000
+exec fastapi run src/aegis_command/main.py --host 0.0.0.0 --port "${PORT:-8000}"

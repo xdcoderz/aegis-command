@@ -2,7 +2,7 @@
 
 ## Context
 
-FinSpark Sentinel accepts privileged-session telemetry from a PAM, IAM, SIEM, or replay generator. It evaluates behavior against historical user and role baselines and returns a risk-based access decision. Analysts review the decision and its evidence in the web console.
+Aegis Command accepts privileged-session telemetry from a PAM, IAM, SIEM, or replay generator. It evaluates behavior against historical user and role baselines and returns a risk-based access decision. Analysts review the decision and its evidence in the web console.
 
 ## Runtime components
 

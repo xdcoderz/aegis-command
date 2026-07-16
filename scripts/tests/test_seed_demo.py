@@ -61,7 +61,7 @@ def test_api_base_accepts_only_loopback_v1() -> None:
 
 
 def test_database_guard_rejects_every_path_except_project_database(tmp_path: Path) -> None:
-    other = tmp_path / "finspark.db"
+    other = tmp_path / "aegis-command.db"
     _demo_database(other)
 
     with pytest.raises(SeedError, match="unexpected database"):
@@ -69,5 +69,5 @@ def test_database_guard_rejects_every_path_except_project_database(tmp_path: Pat
     with pytest.raises(SeedError, match="unexpected database"):
         reset_local_database(other)
 
-    assert LOCAL_DEMO_DB.name == "finspark.db"
+    assert LOCAL_DEMO_DB.name == "aegis-command.db"
     assert LOCAL_DEMO_DB.parent.name == "api"

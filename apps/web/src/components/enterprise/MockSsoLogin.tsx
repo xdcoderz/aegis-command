@@ -16,7 +16,7 @@ export interface MockSsoLoginProps {
   productName?: string;
 }
 
-export function MockSsoLogin({ onLogin, busy = false, productName = "FinSpark Sentinel" }: MockSsoLoginProps) {
+export function MockSsoLogin({ onLogin, busy = false, productName = "Aegis Command" }: MockSsoLoginProps) {
   const [role, setRole] = useState<EnterpriseRole>("SOC_ANALYST");
   const [error, setError] = useState<string | null>(null);
 
@@ -75,7 +75,7 @@ export function MockSsoLogin({ onLogin, busy = false, productName = "FinSpark Se
           <p className="sso-security-note"><span aria-hidden="true">⌾</span>Mock sign-in for this prototype. No external identity provider is contacted.</p>
           {error && <p className="enterprise-error" role="alert">{error}</p>}
         </div>
-        <footer>FinSpark Hackathon 2026 · Team xdcoderz</footer>
+        <footer>Aegis Command · Controlled demonstration environment</footer>
       </section>
     </main>
   );

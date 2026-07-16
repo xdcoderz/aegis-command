@@ -49,7 +49,7 @@ import type {
 type View = "command" | "sessions" | "investigation" | "vault" | "audit" | "policies";
 type DemoStage = "idle" | "observe" | "analyze" | "decide" | "prove" | "complete";
 
-const SESSION_KEY = "finspark.demo.identity";
+const SESSION_KEY = "aegis-command.demo.identity";
 const PAGE_SIZE = 12;
 
 const navigation: ReadonlyArray<{
@@ -267,15 +267,15 @@ function exportAuditCsv(entries: AuditLogEntry[]) {
     entry.riskScore,
     entry.evidenceStatus ?? "PENDING",
   ]);
-  downloadBlob([header, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n"), "text/csv;charset=utf-8", "finspark-audit.csv");
+  downloadBlob([header, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n"), "text/csv;charset=utf-8", "aegis-command-audit.csv");
 }
 
 function exportAuditPdf(entries: AuditLogEntry[]) {
   const safe = (value: string | number) => String(value).replace(/[<>&]/g, (character) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" })[character] ?? character);
   const rows = entries.map((entry) => `<tr><td>${safe(new Date(entry.timestamp).toLocaleString())}</td><td>${safe(entry.sessionId)}</td><td>${safe(entry.action)}</td><td>${safe(entry.actor)}</td><td>${safe(Math.round(entry.riskScore))}</td><td>${safe(entry.evidenceStatus ?? "PENDING")}</td></tr>`).join("");
-  const report = window.open("", "finspark-audit-report", "width=1100,height=760");
+  const report = window.open("", "aegis-command-audit-report", "width=1100,height=760");
   if (!report) throw new Error("Allow pop-ups to generate the printable PDF report.");
-  report.document.write(`<!doctype html><html><head><title>FinSpark Sentinel audit log</title><style>body{font:12px Arial;color:#10213b;padding:34px}h1{margin:0 0 5px}p{color:#5f6f85;margin:0 0 24px}table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #dbe2ec;text-align:left}th{font-size:10px;text-transform:uppercase;background:#f2f5f9}@media print{button{display:none}}</style></head><body><h1>FinSpark Sentinel audit log</h1><p>Generated ${safe(new Date().toLocaleString())} &middot; ${entries.length} records</p><table><thead><tr><th>Timestamp</th><th>Session</th><th>Action</th><th>Actor</th><th>Risk</th><th>Record status</th></tr></thead><tbody>${rows}</tbody></table><script>window.onload=()=>window.print()<\/script></body></html>`);
+  report.document.write(`<!doctype html><html><head><title>Aegis Command audit log</title><style>body{font:12px Arial;color:#10213b;padding:34px}h1{margin:0 0 5px}p{color:#5f6f85;margin:0 0 24px}table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #dbe2ec;text-align:left}th{font-size:10px;text-transform:uppercase;background:#f2f5f9}@media print{button{display:none}}</style></head><body><h1>Aegis Command audit log</h1><p>Generated ${safe(new Date().toLocaleString())} &middot; ${entries.length} records</p><table><thead><tr><th>Timestamp</th><th>Session</th><th>Action</th><th>Actor</th><th>Risk</th><th>Record status</th></tr></thead><tbody>${rows}</tbody></table><script>window.onload=()=>window.print()<\/script></body></html>`);
   report.document.close();
 }
 
@@ -283,13 +283,13 @@ function DemoPipeline({ stage, onRun, busy }: { stage: DemoStage; onRun: () => v
   const order: DemoStage[] = ["observe", "analyze", "decide", "prove"];
   const current = stage === "complete" ? order.length : order.indexOf(stage);
   return (
-    <section className={`judge-demo-strip ${busy ? "is-running" : ""}`} aria-live="polite">
-      <div className="judge-demo-copy">
+    <section className={`guided-demo-strip ${busy ? "is-running" : ""}`} aria-live="polite">
+      <div className="guided-demo-copy">
         <span>CONTROLLED TEST SCENARIO</span>
         <strong>{busy ? "Processing the test session" : "Test the full decision path"}</strong>
         <p>Run a synthetic misuse event through risk scoring, policy evaluation, response, and audit recording.</p>
       </div>
-      <ol className="judge-demo-steps">
+      <ol className="guided-demo-steps">
         {demoSteps.map((step, index) => {
           const state = stage === "complete" || current > index ? "done" : current === index ? "active" : "idle";
           return <li className={state} key={step.stage}><i>{state === "done" ? "✓" : index + 1}</i><span><strong>{step.label}</strong><small>{step.caption}</small></span></li>;
@@ -479,7 +479,7 @@ export default function App() {
   async function respond(action: InvestigationAction, note: string): Promise<ResponseActionResult> {
     if (!investigation) throw new Error("No active session selected.");
     const apiAction: ResponseAction = action === "STEP_UP_AUTH" ? "STEP_UP" : action;
-    const result = await api.sessionAction(investigation.session_id, apiAction, note || `Action confirmed in FinSpark analyst console by ${identity?.displayName ?? "SOC analyst"}.`);
+    const result = await api.sessionAction(investigation.session_id, apiAction, note || `Action confirmed in Aegis Command analyst console by ${identity?.displayName ?? "SOC analyst"}.`);
     setInvestigation(await api.session(investigation.session_id));
     void loadOverview(true);
     return {
@@ -506,15 +506,15 @@ export default function App() {
   const currentView = view === "investigation" ? "sessions" : view;
 
   return (
-    <div className="sentinel-app">
+    <div className="aegis-app">
       <aside className="app-sidebar">
         <button className="app-brand" onClick={() => void navigate("command")} type="button">
           <span className="brand-mark"><i />FS</span>
-          <span><strong>FinSpark</strong><small>SENTINEL</small></span>
+          <span><strong>Aegis</strong><small>COMMAND</small></span>
         </button>
 
         <div className="sidebar-context"><span>WORKSPACE</span><strong>Privileged access</strong><small>Demonstration environment</small></div>
-        <nav aria-label="FinSpark product navigation">
+        <nav aria-label="Aegis Command product navigation">
           {navigation.map((item) => (
             <button className={currentView === item.view ? "active" : ""} key={item.view} onClick={() => void navigate(item.view)} type="button">
               <span><EnterpriseIcon name={item.icon} size={18} /></span>{item.label}
@@ -537,7 +537,7 @@ export default function App() {
 
       <main className="app-main">
         <header className="app-topbar">
-          <div className="environment-label"><i className={ready ? "online" : ""} /><span>FINSPARK BANK</span><b>/</b><strong>Security operations</strong></div>
+          <div className="environment-label"><i className={ready ? "online" : ""} /><span>NORTHSTAR BANK</span><b>/</b><strong>Security operations</strong></div>
           <div className="topbar-actions">
             <span className="live-clock"><EnterpriseIcon name="clock" size={14} /> Auto-refresh · every 8 seconds</span>
             <label className="role-switch"><span>View as</span><select aria-label="Switch operating role" onChange={(event) => changeRole(event.target.value as EnterpriseRole)} value={identity.role}><option value="SOC_ANALYST">SOC analyst</option><option value="SECURITY_ADMIN">Security admin</option></select></label>

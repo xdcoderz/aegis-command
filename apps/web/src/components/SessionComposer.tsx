@@ -86,7 +86,7 @@ export function SessionComposer({ busy, onSubmit }: Props) {
           <label className="field"><span>Source IP address</span><input required value={event.source_ip} onChange={(e) => setEvent({ ...event, source_ip: e.target.value })} /><small>Where the session originated</small></label>
         </div>
 
-        <label className="field command-field"><span>Observed commands</span><textarea required rows={4} value={event.commands.join("\n")} onChange={(e) => setEvent({ ...event, commands: e.target.value.split("\n").filter(Boolean) })} /><small>Enter one command per line. FinSpark treats this as telemetry, never as executable input.</small></label>
+        <label className="field command-field"><span>Observed commands</span><textarea required rows={4} value={event.commands.join("\n")} onChange={(e) => setEvent({ ...event, commands: e.target.value.split("\n").filter(Boolean) })} /><small>Enter one command per line. Aegis Command treats this as telemetry, never as executable input.</small></label>
 
         <details className="advanced-details">
           <summary><span><strong>Review advanced signals</strong><small>Optional details improve the recommendation</small></span><i>+</i></summary>

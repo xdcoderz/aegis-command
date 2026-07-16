@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
-from finspark.core import get_settings
-from finspark.main import create_app
+from aegis_command.core import get_settings
+from aegis_command.main import create_app
 
 
 def session_payload() -> dict[str, object]:
@@ -25,8 +25,8 @@ def session_payload() -> dict[str, object]:
 
 
 def test_health_and_assessment_flow(tmp_path, monkeypatch) -> None:
-    monkeypatch.setenv("FINSPARK_DATABASE_URL", f"sqlite+aiosqlite:///{tmp_path / 'test.db'}")
-    monkeypatch.setenv("FINSPARK_PQC_REQUIRED", "false")
+    monkeypatch.setenv("AEGIS_DATABASE_URL", f"sqlite+aiosqlite:///{tmp_path / 'test.db'}")
+    monkeypatch.setenv("AEGIS_PQC_REQUIRED", "false")
     get_settings.cache_clear()
     app = create_app()
 
@@ -138,7 +138,7 @@ def test_health_and_assessment_flow(tmp_path, monkeypatch) -> None:
 
         metrics = client.get("/api/v1/operations/metrics")
         assert metrics.status_code == 200
-        assert "finspark_assessments_total" in metrics.text
+        assert "aegis_command_assessments_total" in metrics.text
 
     with TestClient(create_app()) as restarted:
         persisted_policy = restarted.get("/api/v1/policies")
@@ -151,11 +151,11 @@ def test_health_and_assessment_flow(tmp_path, monkeypatch) -> None:
 
 
 def test_api_key_roles_are_enforced(tmp_path, monkeypatch) -> None:
-    monkeypatch.setenv("FINSPARK_DATABASE_URL", f"sqlite+aiosqlite:///{tmp_path / 'auth.db'}")
-    monkeypatch.setenv("FINSPARK_PQC_REQUIRED", "false")
-    monkeypatch.setenv("FINSPARK_AUTH_ENABLED", "true")
+    monkeypatch.setenv("AEGIS_DATABASE_URL", f"sqlite+aiosqlite:///{tmp_path / 'auth.db'}")
+    monkeypatch.setenv("AEGIS_PQC_REQUIRED", "false")
+    monkeypatch.setenv("AEGIS_AUTH_ENABLED", "true")
     monkeypatch.setenv(
-        "FINSPARK_API_KEYS",
+        "AEGIS_API_KEYS",
         '{"observer-key-0001":"observer","analyst-key-0001":"analyst"}',
     )
     get_settings.cache_clear()

@@ -7,9 +7,9 @@ from typing import Any
 from sqlalchemy import Connection, pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+from aegis_command.core import get_settings
+from aegis_command.infrastructure.database import Base
 from alembic import context
-from finspark.core import get_settings
-from finspark.infrastructure.database import Base
 
 config = context.config
 config.set_main_option("sqlalchemy.url", get_settings().database_url)

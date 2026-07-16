@@ -22,7 +22,7 @@ const decisionGuide: Record<AccessDecision, { title: string; copy: string }> = {
   },
   STEP_UP_AUTH: {
     title: "Verify the user again",
-    copy: "FinSpark found meaningful changes. Request stronger authentication before access continues.",
+    copy: "Aegis Command found meaningful changes. Request stronger authentication before access continues.",
   },
   BLOCK: {
     title: "Stop and investigate",
@@ -38,7 +38,7 @@ function EmptyResult() {
         <div><h3>Understand the recommendation</h3><p>Your result will appear here after the session is evaluated.</p></div>
       </div>
       <div className="empty-visual"><span className="scan-ring"><i>FS</i></span></div>
-      <div className="empty-copy"><h3>Nothing to interpret yet</h3><p>FinSpark will turn the session details into a clear score, action, and explanation.</p></div>
+      <div className="empty-copy"><h3>Nothing to interpret yet</h3><p>Aegis Command will turn the session details into a clear score, action, and explanation.</p></div>
       <div className="what-you-get">
         <span>What you’ll get</span>
         <div><i>01</i><p><strong>A risk score</strong><small>A simple 0–100 measure of concern</small></p></div>
@@ -94,7 +94,7 @@ export function RiskPanel({
       </div>
 
       <div className="factor-section">
-        <div className="factor-heading"><div><h3>Why FinSpark made this decision</h3><p>Higher-impact signals appear first.</p></div><span>{assessment.factors.length} signals</span></div>
+        <div className="factor-heading"><div><h3>Why Aegis Command made this decision</h3><p>Higher-impact signals appear first.</p></div><span>{assessment.factors.length} signals</span></div>
         <div className="factor-list">
           {assessment.factors.map((factor, index) => (
             <div className="factor" key={factor.key}>

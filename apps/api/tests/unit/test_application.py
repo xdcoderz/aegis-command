@@ -1,11 +1,11 @@
-from finspark.analytics.risk import RiskPolicy
-from finspark.analytics.runtime import DetectionRuntime
-from finspark.analytics.synthetic import SyntheticSessionGenerator
-from finspark.application.services import AssessmentService
-from finspark.domain.models import EnforcementResult, EnforcementStatus, SessionAssessment
-from finspark.infrastructure.database import InMemoryAssessmentRepository
-from finspark.infrastructure.enforcement import LoggingEnforcementAdapter
-from finspark.security.pqc import NullAuditSigner
+from aegis_command.analytics.risk import RiskPolicy
+from aegis_command.analytics.runtime import DetectionRuntime
+from aegis_command.analytics.synthetic import SyntheticSessionGenerator
+from aegis_command.application.services import AssessmentService
+from aegis_command.domain.models import EnforcementResult, EnforcementStatus, SessionAssessment
+from aegis_command.infrastructure.database import InMemoryAssessmentRepository
+from aegis_command.infrastructure.enforcement import LoggingEnforcementAdapter
+from aegis_command.security.pqc import NullAuditSigner
 
 
 class RecoveringEnforcementAdapter:
